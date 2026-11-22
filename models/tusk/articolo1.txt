@@ -1,0 +1,18 @@
+{
+  "setup": {
+    "units": "cm"
+  },
+  "models": [
+    {
+      "uri": "tusk.glb",
+      "name": "Modello Principale"
+    }
+  ],
+  "articles": [
+    {
+      "id": "articolo-principale",
+      "title": "Introduzione",
+      "uri": "articolo1.html"
+    }
+  ]
+}
