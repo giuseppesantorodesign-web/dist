@@ -111,16 +111,22 @@
       background: #000;
     }
 
-    /* Quando la pagina è a schermo intero, nasconde la barra in alto e espande l'area contenuti */
-    :fullscreen header,
-    :-webkit-full-screen header {
-      display: none;
+    /* Nasconde la barra in alto e espande l'area contenuti quando è attivo lo schermo intero */
+    body.is-fullscreen header,
+    html:fullscreen header,
+    body:fullscreen header,
+    html:-webkit-full-screen header,
+    body:-webkit-full-screen header {
+      display: none !important;
     }
 
-    :fullscreen main,
-    :-webkit-full-screen main {
-      height: 100vh;
-      width: 100vw;
+    body.is-fullscreen main,
+    html:fullscreen main,
+    body:fullscreen main,
+    html:-webkit-full-screen main,
+    body:-webkit-full-screen main {
+      height: 100vh !important;
+      width: 100vw !important;
     }
 
     .panel {
@@ -179,16 +185,16 @@
     </div>
 
     <nav aria-label="Sezioni progetto">
-      <button class="tab-btn active" data-target="figma" onclick="switchTab('figma')" title="Scorciatoia: Alt/Option + 1 oppure 1">
+      <button class="tab-btn active" data-target="figma" onclick="switchTab('figma')">
         1. Presentazione
       </button>
-      <button class="tab-btn" data-target="kuula" onclick="switchTab('kuula')" title="Scorciatoia: Alt/Option + 2 oppure 2">
+      <button class="tab-btn" data-target="kuula" onclick="switchTab('kuula')">
         2. Tour Virtuale 360°
       </button>
-      <button class="tab-btn" data-target="voyager" onclick="switchTab('voyager')" title="Scorciatoia: Alt/Option + 3 oppure 3">
+      <button class="tab-btn" data-target="voyager" onclick="switchTab('voyager')">
         3. Modello 3D
       </button>
-      <button class="action-btn hide-mobile" onclick="toggleFullscreen()" title="Attiva o esci dallo schermo intero (Alt/Option + F)">
+      <button class="action-btn hide-mobile" onclick="toggleFullscreen()" title="Attiva o esci dallo schermo intero">
         ⛶ Schermo intero
       </button>
       <a id="open-direct" class="action-btn hide-mobile" href="https://www.figma.com/proto/RCbz7tdR37fKaC2JMt8dwM/Museo-della-Cultura-e-Musica-Popolare-dei-Peloritani_Allestimento-e-visita-virtuale_Slide?node-id=1-1252&p=f&scaling=contain&content-scaling=fixed&starting-point-node-id=1%3A1252&page-id=0%3A1" target="_blank" rel="noopener" title="Apri la scheda corrente in una nuova finestra">
@@ -257,6 +263,11 @@
       window.focus();
     }
 
+    function syncFullscreenClass() {
+      const activeFs = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+      document.body.classList.toggle("is-fullscreen", activeFs);
+    }
+
     function toggleFullscreen() {
       const fsElement = document.fullscreenElement || document.webkitFullscreenElement;
       if (!fsElement) {
@@ -272,50 +283,8 @@
       }
     }
 
-    function handleKeyDown(e) {
-      const tag = e.target && e.target.tagName ? e.target.tagName.toLowerCase() : "";
-      if (tag === "input" || tag === "textarea" || e.metaKey || e.ctrlKey) return;
-
-      // Scorciatoia universale Mac (Option) / Windows (Alt) + 1, 2, 3
-      if (e.altKey) {
-        if (e.code === "Digit1" || e.key === "1") {
-          e.preventDefault();
-          switchTab("figma");
-          return;
-        }
-        if (e.code === "Digit2" || e.key === "2") {
-          e.preventDefault();
-          switchTab("kuula");
-          return;
-        }
-        if (e.code === "Digit3" || e.key === "3") {
-          e.preventDefault();
-          switchTab("voyager");
-          return;
-        }
-        if (e.code === "KeyF" || e.key.toLowerCase() === "f") {
-          e.preventDefault();
-          toggleFullscreen();
-          return;
-        }
-      }
-
-      // Tasti singoli 1, 2, 3 quando non si usa Alt/Cmd/Ctrl
-      if (!e.altKey) {
-        if (e.key === "1") {
-          e.preventDefault();
-          switchTab("figma");
-        } else if (e.key === "2") {
-          e.preventDefault();
-          switchTab("kuula");
-        } else if (e.key === "3") {
-          e.preventDefault();
-          switchTab("voyager");
-        }
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("fullscreenchange", syncFullscreenClass);
+    document.addEventListener("webkitfullscreenchange", syncFullscreenClass);
   </script>
 </body>
 </html>
