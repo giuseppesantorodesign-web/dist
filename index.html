@@ -28,12 +28,16 @@
       color: var(--text-main);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       overflow: hidden;
+    }
+
+    body {
       display: flex;
       flex-direction: column;
     }
 
     header {
       height: 52px;
+      min-height: 52px;
       background-color: var(--bar-bg);
       border-bottom: 1px solid var(--border-color);
       display: flex;
@@ -42,7 +46,8 @@
       padding: 0 18px;
       gap: 12px;
       flex-shrink: 0;
-      z-index: 10;
+      position: relative;
+      z-index: 50;
     }
 
     .brand {
@@ -73,6 +78,8 @@
       align-items: center;
       gap: 8px;
       flex-shrink: 0;
+      position: relative;
+      z-index: 51;
     }
 
     .tab-btn, .action-btn {
@@ -85,10 +92,12 @@
       font-weight: 500;
       cursor: pointer;
       transition: all 0.18s ease;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 5px;
       text-decoration: none;
+      position: relative;
+      z-index: 52;
     }
 
     .tab-btn:hover, .action-btn:hover {
@@ -105,13 +114,13 @@
 
     main {
       position: relative;
-      flex: 1;
+      flex: 1 1 auto;
       width: 100%;
-      height: calc(100vh - 52px);
+      min-height: 0;
       background: #000;
+      z-index: 1;
     }
 
-    /* Nasconde la barra in alto e espande l'area contenuti quando è attivo lo schermo intero (Safari, Firefox, Chrome, Edge) */
     body.is-fullscreen header,
     html:fullscreen header,
     body:fullscreen header,
@@ -174,9 +183,6 @@
       .hide-mobile {
         display: none;
       }
-      main {
-        height: calc(100vh - 82px);
-      }
     }
   </style>
 </head>
@@ -189,16 +195,16 @@
     </div>
 
     <nav aria-label="Sezioni progetto">
-      <button class="tab-btn active" data-target="figma" onclick="switchTab('figma')">
+      <button type="button" class="tab-btn active" data-target="figma">
         1. Presentazione
       </button>
-      <button class="tab-btn" data-target="kuula" onclick="switchTab('kuula')">
+      <button type="button" class="tab-btn" data-target="kuula">
         2. Tour Virtuale 360°
       </button>
-      <button class="tab-btn" data-target="voyager" onclick="switchTab('voyager')">
+      <button type="button" class="tab-btn" data-target="voyager">
         3. Modello 3D
       </button>
-      <button class="action-btn hide-mobile" onclick="toggleFullscreen()" title="Attiva o esci dallo schermo intero">
+      <button type="button" class="action-btn hide-mobile" id="btn-fullscreen" title="Attiva o esci dallo schermo intero">
         ⛶ Schermo intero
       </button>
       <a id="open-direct" class="action-btn hide-mobile" href="https://www.figma.com/proto/RCbz7tdR37fKaC2JMt8dwM/Museo-della-Cultura-e-Musica-Popolare-dei-Peloritani_Allestimento-e-visita-virtuale_Slide?node-id=1-1252&p=f&scaling=contain&content-scaling=fixed&starting-point-node-id=1%3A1252&page-id=0%3A1" target="_blank" rel="noopener" title="Apri la scheda corrente in una nuova finestra">
@@ -246,6 +252,8 @@
     };
 
     function switchTab(tabName) {
+      if (!tabName) return;
+
       document.querySelectorAll(".tab-btn").forEach((btn) => {
         btn.classList.toggle("active", btn.dataset.target === tabName);
       });
@@ -255,7 +263,7 @@
       });
 
       const frame = document.getElementById("frame-" + tabName);
-      if (frame && !frame.getAttribute("src")) {
+      if (frame && !frame.getAttribute("src") && frame.dataset.src) {
         frame.setAttribute("src", frame.dataset.src);
       }
 
@@ -263,8 +271,6 @@
       if (ext && directUrls[tabName]) {
         ext.href = directUrls[tabName];
       }
-
-      window.focus();
     }
 
     function syncFullscreenClass() {
@@ -276,4 +282,59 @@
       document.body.classList.toggle("is-fullscreen", activeFs);
 
       const header = document.querySelector("header");
-      const main = document.
+      const main = document.querySelector("main");
+      if (header) {
+        header.style.display = activeFs ? "none" : "";
+      }
+      if (main) {
+        main.style.height = activeFs ? "100vh" : "";
+        main.style.width = activeFs ? "100vw" : "";
+      }
+    }
+
+    function toggleFullscreen() {
+      const fsElement =
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement;
+
+      if (!fsElement) {
+        const req =
+          document.documentElement.requestFullscreen ||
+          document.documentElement.webkitRequestFullscreen ||
+          document.documentElement.mozRequestFullScreen;
+        if (req) {
+          req.call(document.documentElement).catch(() => {});
+        }
+      } else {
+        const exit =
+          document.exitFullscreen ||
+          document.webkitExitFullscreen ||
+          document.mozCancelFullScreen;
+        if (exit) {
+          exit.call(document).catch(() => {});
+        }
+      }
+    }
+
+    document.querySelectorAll(".tab-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        switchTab(btn.dataset.target);
+      });
+    });
+
+    const fsBtn = document.getElementById("btn-fullscreen");
+    if (fsBtn) {
+      fsBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        toggleFullscreen();
+      });
+    }
+
+    document.addEventListener("fullscreenchange", syncFullscreenClass);
+    document.addEventListener("webkitfullscreenchange", syncFullscreenClass);
+    document.addEventListener("mozfullscreenchange", syncFullscreenClass);
+  </script>
+</body>
+</html>
