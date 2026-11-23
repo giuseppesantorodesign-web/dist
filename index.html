@@ -179,16 +179,16 @@
     </div>
 
     <nav aria-label="Sezioni progetto">
-      <button class="tab-btn active" data-target="figma" onclick="switchTab('figma')">
+      <button class="tab-btn active" data-target="figma" onclick="switchTab('figma')" title="Scorciatoia: Alt/Option + 1 oppure 1">
         1. Presentazione
       </button>
-      <button class="tab-btn" data-target="kuula" onclick="switchTab('kuula')">
+      <button class="tab-btn" data-target="kuula" onclick="switchTab('kuula')" title="Scorciatoia: Alt/Option + 2 oppure 2">
         2. Tour Virtuale 360°
       </button>
-      <button class="tab-btn" data-target="voyager" onclick="switchTab('voyager')">
+      <button class="tab-btn" data-target="voyager" onclick="switchTab('voyager')" title="Scorciatoia: Alt/Option + 3 oppure 3">
         3. Modello 3D
       </button>
-      <button class="action-btn hide-mobile" onclick="toggleFullscreen()" title="Attiva o esci dallo schermo intero">
+      <button class="action-btn hide-mobile" onclick="toggleFullscreen()" title="Attiva o esci dallo schermo intero (Alt/Option + F)">
         ⛶ Schermo intero
       </button>
       <a id="open-direct" class="action-btn hide-mobile" href="https://www.figma.com/proto/RCbz7tdR37fKaC2JMt8dwM/Museo-della-Cultura-e-Musica-Popolare-dei-Peloritani_Allestimento-e-visita-virtuale_Slide?node-id=1-1252&p=f&scaling=contain&content-scaling=fixed&starting-point-node-id=1%3A1252&page-id=0%3A1" target="_blank" rel="noopener" title="Apri la scheda corrente in una nuova finestra">
@@ -253,6 +253,8 @@
       if (ext && directUrls[tabName]) {
         ext.href = directUrls[tabName];
       }
+
+      window.focus();
     }
 
     function toggleFullscreen() {
@@ -269,6 +271,51 @@
         }
       }
     }
+
+    function handleKeyDown(e) {
+      const tag = e.target && e.target.tagName ? e.target.tagName.toLowerCase() : "";
+      if (tag === "input" || tag === "textarea" || e.metaKey || e.ctrlKey) return;
+
+      // Scorciatoia universale Mac (Option) / Windows (Alt) + 1, 2, 3
+      if (e.altKey) {
+        if (e.code === "Digit1" || e.key === "1") {
+          e.preventDefault();
+          switchTab("figma");
+          return;
+        }
+        if (e.code === "Digit2" || e.key === "2") {
+          e.preventDefault();
+          switchTab("kuula");
+          return;
+        }
+        if (e.code === "Digit3" || e.key === "3") {
+          e.preventDefault();
+          switchTab("voyager");
+          return;
+        }
+        if (e.code === "KeyF" || e.key.toLowerCase() === "f") {
+          e.preventDefault();
+          toggleFullscreen();
+          return;
+        }
+      }
+
+      // Tasti singoli 1, 2, 3 quando non si usa Alt/Cmd/Ctrl
+      if (!e.altKey) {
+        if (e.key === "1") {
+          e.preventDefault();
+          switchTab("figma");
+        } else if (e.key === "2") {
+          e.preventDefault();
+          switchTab("kuula");
+        } else if (e.key === "3") {
+          e.preventDefault();
+          switchTab("voyager");
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
   </script>
 </body>
 </html>
