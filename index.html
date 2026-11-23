@@ -40,6 +40,8 @@
       justify-content: space-between;
       padding: 0 18px;
       gap: 12px;
+      z-index: 100;
+      transition: transform 0.25s ease, opacity 0.25s ease;
     }
 
     .brand {
@@ -123,19 +125,44 @@
       display: block;
     }
 
-    /* Schermo intero: nasconde la barra in alto e porta main al 100% su Firefox, Safari, Chrome, Edge */
-    html:fullscreen header,
-    html:-webkit-full-screen header,
-    html:-moz-full-screen header,
-    body.is-fullscreen header {
-      display: none !important;
+    /* Sensore invisibile sul bordo alto attivo solo a schermo intero */
+    #top-hover-zone {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 14px;
+      z-index: 90;
+      background: transparent;
     }
 
-    html:fullscreen main,
-    html:-webkit-full-screen main,
-    html:-moz-full-screen main,
+    /* Modalità Schermo Intero: contenuti al 100%, barra nascosta in alto e visibile al passaggio del mouse */
+    body.is-fullscreen #top-hover-zone {
+      display: block;
+    }
+
     body.is-fullscreen main {
       height: 100% !important;
+      width: 100% !important;
+    }
+
+    body.is-fullscreen header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background-color: rgba(22, 25, 32, 0.94);
+      backdrop-filter: blur(8px);
+      transform: translateY(-100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    body.is-fullscreen.bar-visible header {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
     }
 
     @media (max-width: 820px) {
@@ -167,6 +194,8 @@
   </style>
 </head>
 <body>
+
+  <div id="top-hover-zone" aria-hidden="true"></div>
 
   <header id="top-bar">
     <div class="brand">
@@ -231,6 +260,22 @@
       voyager: "https://giuseppesantorodesign-web.github.io/dist/voyager-explorer.html?root=models/tusk/&document=tusk.svx.json"
     };
 
+    let hideTimer = null;
+
+    function showTopBar() {
+      if (!document.body.classList.contains("is-fullscreen")) return;
+      clearTimeout(hideTimer);
+      document.body.classList.add("bar-visible");
+    }
+
+    function scheduleHideTopBar() {
+      if (!document.body.classList.contains("is-fullscreen")) return;
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => {
+        document.body.classList.remove("bar-visible");
+      }, 450);
+    }
+
     function switchTab(tabName, clickedBtn) {
       document.querySelectorAll(".tab-btn").forEach((btn) => {
         btn.classList.remove("active");
@@ -259,6 +304,9 @@
       if (ext && directUrls[tabName]) {
         ext.href = directUrls[tabName];
       }
+
+      // Richiude dolcemente la barra dopo aver scelto la scheda a schermo intero
+      scheduleHideTopBar();
     }
 
     function updateFullscreenUI() {
@@ -268,11 +316,10 @@
         document.mozFullScreenElement
       );
       document.body.classList.toggle("is-fullscreen", isFs);
-
-      const bar = document.getElementById("top-bar");
-      const area = document.getElementById("content-area");
-      if (bar) bar.style.display = isFs ? "none" : "flex";
-      if (area) area.style.height = isFs ? "100%" : "calc(100% - 52px)";
+      if (!isFs) {
+        clearTimeout(hideTimer);
+        document.body.classList.remove("bar-visible");
+      }
     }
 
     function toggleFullscreen() {
@@ -289,6 +336,17 @@
         const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen;
         if (exit) exit.call(document).catch(() => {});
       }
+    }
+
+    const hoverZone = document.getElementById("top-hover-zone");
+    const topBar = document.getElementById("top-bar");
+
+    if (hoverZone) {
+      hoverZone.addEventListener("mouseenter", showTopBar);
+    }
+    if (topBar) {
+      topBar.addEventListener("mouseenter", showTopBar);
+      topBar.addEventListener("mouseleave", scheduleHideTopBar);
     }
 
     document.addEventListener("fullscreenchange", updateFullscreenUI);
