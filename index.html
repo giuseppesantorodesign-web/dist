@@ -111,6 +111,18 @@
       background: #000;
     }
 
+    /* Quando la pagina è a schermo intero, nasconde la barra in alto e espande l'area contenuti */
+    :fullscreen header,
+    :-webkit-full-screen header {
+      display: none;
+    }
+
+    :fullscreen main,
+    :-webkit-full-screen main {
+      height: 100vh;
+      width: 100vw;
+    }
+
     .panel {
       position: absolute;
       inset: 0;
@@ -243,10 +255,17 @@
     }
 
     function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {});
+      const fsElement = document.fullscreenElement || document.webkitFullscreenElement;
+      if (!fsElement) {
+        const req = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen;
+        if (req) {
+          req.call(document.documentElement).catch(() => {});
+        }
       } else {
-        document.exitFullscreen().catch(() => {});
+        const exit = document.exitFullscreen || document.webkitExitFullscreen;
+        if (exit) {
+          exit.call(document).catch(() => {});
+        }
       }
     }
   </script>
