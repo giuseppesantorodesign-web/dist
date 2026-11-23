@@ -22,22 +22,17 @@
     }
 
     html, body {
-      height: 100%;
       width: 100%;
+      height: 100%;
       background-color: var(--bg-dark);
       color: var(--text-main);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       overflow: hidden;
     }
 
-    body {
-      display: flex;
-      flex-direction: column;
-    }
-
     header {
+      width: 100%;
       height: 52px;
-      min-height: 52px;
       background-color: var(--bar-bg);
       border-bottom: 1px solid var(--border-color);
       display: flex;
@@ -45,9 +40,6 @@
       justify-content: space-between;
       padding: 0 18px;
       gap: 12px;
-      flex-shrink: 0;
-      position: relative;
-      z-index: 50;
     }
 
     .brand {
@@ -78,8 +70,6 @@
       align-items: center;
       gap: 8px;
       flex-shrink: 0;
-      position: relative;
-      z-index: 51;
     }
 
     .tab-btn, .action-btn {
@@ -96,8 +86,6 @@
       align-items: center;
       gap: 5px;
       text-decoration: none;
-      position: relative;
-      z-index: 52;
     }
 
     .tab-btn:hover, .action-btn:hover {
@@ -113,38 +101,12 @@
     }
 
     main {
-      position: relative;
-      flex: 1 1 auto;
       width: 100%;
-      min-height: 0;
+      height: calc(100% - 52px);
       background: #000;
-      z-index: 1;
-    }
-
-    body.is-fullscreen header,
-    html:fullscreen header,
-    body:fullscreen header,
-    html:-webkit-full-screen header,
-    body:-webkit-full-screen header,
-    html:-moz-full-screen header,
-    body:-moz-full-screen header {
-      display: none !important;
-    }
-
-    body.is-fullscreen main,
-    html:fullscreen main,
-    body:fullscreen main,
-    html:-webkit-full-screen main,
-    body:-webkit-full-screen main,
-    html:-moz-full-screen main,
-    body:-moz-full-screen main {
-      height: 100vh !important;
-      width: 100vw !important;
     }
 
     .panel {
-      position: absolute;
-      inset: 0;
       width: 100%;
       height: 100%;
       display: none;
@@ -159,6 +121,21 @@
       height: 100%;
       border: none;
       display: block;
+    }
+
+    /* Schermo intero: nasconde la barra in alto e porta main al 100% su Firefox, Safari, Chrome, Edge */
+    html:fullscreen header,
+    html:-webkit-full-screen header,
+    html:-moz-full-screen header,
+    body.is-fullscreen header {
+      display: none !important;
+    }
+
+    html:fullscreen main,
+    html:-webkit-full-screen main,
+    html:-moz-full-screen main,
+    body.is-fullscreen main {
+      height: 100% !important;
     }
 
     @media (max-width: 820px) {
@@ -183,28 +160,31 @@
       .hide-mobile {
         display: none;
       }
+      main {
+        height: calc(100% - 82px);
+      }
     }
   </style>
 </head>
 <body>
 
-  <header>
+  <header id="top-bar">
     <div class="brand">
       <span class="brand-title">Museo della Cultura e Musica Popolare dei Peloritani</span>
       <span class="brand-sub">Allestimento e visita virtuale</span>
     </div>
 
     <nav aria-label="Sezioni progetto">
-      <button type="button" class="tab-btn active" data-target="figma">
+      <button type="button" class="tab-btn active" onclick="switchTab('figma', this)">
         1. Presentazione
       </button>
-      <button type="button" class="tab-btn" data-target="kuula">
+      <button type="button" class="tab-btn" onclick="switchTab('kuula', this)">
         2. Tour Virtuale 360°
       </button>
-      <button type="button" class="tab-btn" data-target="voyager">
+      <button type="button" class="tab-btn" onclick="switchTab('voyager', this)">
         3. Modello 3D
       </button>
-      <button type="button" class="action-btn hide-mobile" id="btn-fullscreen" title="Attiva o esci dallo schermo intero">
+      <button type="button" class="action-btn hide-mobile" onclick="toggleFullscreen()" title="Attiva o esci dallo schermo intero">
         ⛶ Schermo intero
       </button>
       <a id="open-direct" class="action-btn hide-mobile" href="https://www.figma.com/proto/RCbz7tdR37fKaC2JMt8dwM/Museo-della-Cultura-e-Musica-Popolare-dei-Peloritani_Allestimento-e-visita-virtuale_Slide?node-id=1-1252&p=f&scaling=contain&content-scaling=fixed&starting-point-node-id=1%3A1252&page-id=0%3A1" target="_blank" rel="noopener" title="Apri la scheda corrente in una nuova finestra">
@@ -213,7 +193,7 @@
     </nav>
   </header>
 
-  <main>
+  <main id="content-area">
     <!-- SEZIONE 1: FIGMA -->
     <section id="panel-figma" class="panel active">
       <iframe
@@ -251,16 +231,24 @@
       voyager: "https://giuseppesantorodesign-web.github.io/dist/voyager-explorer.html?root=models/tusk/&document=tusk.svx.json"
     };
 
-    function switchTab(tabName) {
-      if (!tabName) return;
-
+    function switchTab(tabName, clickedBtn) {
       document.querySelectorAll(".tab-btn").forEach((btn) => {
-        btn.classList.toggle("active", btn.dataset.target === tabName);
+        btn.classList.remove("active");
       });
+      if (clickedBtn) {
+        clickedBtn.classList.add("active");
+      }
 
       document.querySelectorAll(".panel").forEach((panel) => {
-        panel.classList.toggle("active", panel.id === "panel-" + tabName);
+        panel.style.display = "none";
+        panel.classList.remove("active");
       });
+
+      const targetPanel = document.getElementById("panel-" + tabName);
+      if (targetPanel) {
+        targetPanel.style.display = "block";
+        targetPanel.classList.add("active");
+      }
 
       const frame = document.getElementById("frame-" + tabName);
       if (frame && !frame.getAttribute("src") && frame.dataset.src) {
@@ -273,23 +261,18 @@
       }
     }
 
-    function syncFullscreenClass() {
-      const activeFs = Boolean(
+    function updateFullscreenUI() {
+      const isFs = Boolean(
         document.fullscreenElement ||
         document.webkitFullscreenElement ||
         document.mozFullScreenElement
       );
-      document.body.classList.toggle("is-fullscreen", activeFs);
+      document.body.classList.toggle("is-fullscreen", isFs);
 
-      const header = document.querySelector("header");
-      const main = document.querySelector("main");
-      if (header) {
-        header.style.display = activeFs ? "none" : "";
-      }
-      if (main) {
-        main.style.height = activeFs ? "100vh" : "";
-        main.style.width = activeFs ? "100vw" : "";
-      }
+      const bar = document.getElementById("top-bar");
+      const area = document.getElementById("content-area");
+      if (bar) bar.style.display = isFs ? "none" : "flex";
+      if (area) area.style.height = isFs ? "100%" : "calc(100% - 52px)";
     }
 
     function toggleFullscreen() {
@@ -299,42 +282,18 @@
         document.mozFullScreenElement;
 
       if (!fsElement) {
-        const req =
-          document.documentElement.requestFullscreen ||
-          document.documentElement.webkitRequestFullscreen ||
-          document.documentElement.mozRequestFullScreen;
-        if (req) {
-          req.call(document.documentElement).catch(() => {});
-        }
+        const el = document.documentElement;
+        const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
+        if (req) req.call(el).catch(() => {});
       } else {
-        const exit =
-          document.exitFullscreen ||
-          document.webkitExitFullscreen ||
-          document.mozCancelFullScreen;
-        if (exit) {
-          exit.call(document).catch(() => {});
-        }
+        const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen;
+        if (exit) exit.call(document).catch(() => {});
       }
     }
 
-    document.querySelectorAll(".tab-btn").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        e.preventDefault();
-        switchTab(btn.dataset.target);
-      });
-    });
-
-    const fsBtn = document.getElementById("btn-fullscreen");
-    if (fsBtn) {
-      fsBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        toggleFullscreen();
-      });
-    }
-
-    document.addEventListener("fullscreenchange", syncFullscreenClass);
-    document.addEventListener("webkitfullscreenchange", syncFullscreenClass);
-    document.addEventListener("mozfullscreenchange", syncFullscreenClass);
+    document.addEventListener("fullscreenchange", updateFullscreenUI);
+    document.addEventListener("webkitfullscreenchange", updateFullscreenUI);
+    document.addEventListener("mozfullscreenchange", updateFullscreenUI);
   </script>
 </body>
 </html>
