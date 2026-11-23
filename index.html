@@ -111,12 +111,14 @@
       background: #000;
     }
 
-    /* Nasconde la barra in alto e espande l'area contenuti quando è attivo lo schermo intero */
+    /* Nasconde la barra in alto e espande l'area contenuti quando è attivo lo schermo intero (Safari, Firefox, Chrome, Edge) */
     body.is-fullscreen header,
     html:fullscreen header,
     body:fullscreen header,
     html:-webkit-full-screen header,
-    body:-webkit-full-screen header {
+    body:-webkit-full-screen header,
+    html:-moz-full-screen header,
+    body:-moz-full-screen header {
       display: none !important;
     }
 
@@ -124,7 +126,9 @@
     html:fullscreen main,
     body:fullscreen main,
     html:-webkit-full-screen main,
-    body:-webkit-full-screen main {
+    body:-webkit-full-screen main,
+    html:-moz-full-screen main,
+    body:-moz-full-screen main {
       height: 100vh !important;
       width: 100vw !important;
     }
@@ -264,27 +268,12 @@
     }
 
     function syncFullscreenClass() {
-      const activeFs = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+      const activeFs = Boolean(
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement
+      );
       document.body.classList.toggle("is-fullscreen", activeFs);
-    }
 
-    function toggleFullscreen() {
-      const fsElement = document.fullscreenElement || document.webkitFullscreenElement;
-      if (!fsElement) {
-        const req = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen;
-        if (req) {
-          req.call(document.documentElement).catch(() => {});
-        }
-      } else {
-        const exit = document.exitFullscreen || document.webkitExitFullscreen;
-        if (exit) {
-          exit.call(document).catch(() => {});
-        }
-      }
-    }
-
-    document.addEventListener("fullscreenchange", syncFullscreenClass);
-    document.addEventListener("webkitfullscreenchange", syncFullscreenClass);
-  </script>
-</body>
-</html>
+      const header = document.querySelector("header");
+      const main = document.
