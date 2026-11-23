@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Museo della Cultura e Musica Popolare dei Peloritani — Visita Virtuale</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <style>
+    :root {
+      --bg-dark: #0f1115;
+      --bar-bg: #161920;
+      --border-color: #262b36;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Barra superiore compatta */
+    header {
+      height: 56px;
+      background-color: var(--bar-bg);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      gap: 16px;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .brand-title {
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text-main);
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Pulsanti di navigazione */
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      border-color: #3f4756;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    .external-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      transition: all 0.18s ease;
+    }
+
+    .external-link:hover {
+      color: var(--text-main);
+      border-color: var(--border-color);
+    }
+
+    /* Area contenuti a schermo intero */
+    main {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      height: calc(100vh - 56px);
+      background: #000;
+    }
+
+    .panel {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: none;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        height: auto;
+        flex-wrap: wrap;
+        padding: 10px 12px;
+      }
+      .brand {
+        width: 100%;
+      }
+      nav {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .tab-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 7px 8px;
+        font-size: 12px;
+      }
+      .external-link {
+        display: none;
+      }
+      main {
+        height: calc(100vh - 86px);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <span class="brand-title">Museo della Cultura e Musica Popolare dei Peloritani</span>
+      <span class="brand-sub">Allestimento e visita virtuale</span>
+    </div>
+
+    <nav aria-label="Sezioni progetto">
+      <button class="tab-btn active" data-target="figma" onclick="switchTab('figma')">
+        1. Presentazione
+      </button>
+      <button class="tab-btn" data-target="kuula" onclick="switchTab('kuula')">
+        2. Tour Virtuale 360°
+      </button>
+      <button class="tab-btn" data-target="voyager" onclick="switchTab('voyager')">
+        3. Modello 3D
+      </button>
+      <a id="open-direct" class="external-link" href="https://www.figma.com/proto/RCbz7tdR37fKaC2JMt8dwM/Museo-della-Cultura-e-Musica-Popolare-dei-Peloritani_Allestimento-e-visita-virtuale_Slide?node-id=1-1252&p=f&viewport=-4135%2C30%2C0.06&scaling=min-zoom&content-scaling=fixed&starting-point-node-id=1%3A1252&page-id=0%3A1" target="_blank" rel="noopener" title="Apri la scheda corrente in una nuova finestra">
+        Apri esterno ↗
+      </a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- SEZIONE 1: FIGMA -->
+    <section id="panel-figma" class="panel active">
+      <iframe
+        src="https://embed.figma.com/proto/RCbz7tdR37fKaC2JMt8dwM/Museo-della-Cultura-e-Musica-Popolare-dei-Peloritani_Allestimento-e-visita-virtuale_Slide?node-id=1-1252&p=f&viewport=-4135%2C30%2C0.06&scaling=min-zoom&content-scaling=fixed&starting-point-node-id=1%3A1252&page-id=0%3A1&embed-host=share&hide-ui=1"
+        allowfullscreen>
+      </iframe>
+    </section>
+
+    <!-- SEZIONE 2: KUULA (caricata al primo clic per non rallentare l'avvio) -->
+    <section id="panel-kuula" class="panel">
+      <iframe
+        id="frame-kuula"
+        data-src="https://kuula.co/share/collection/7dZJG?logo=-1&info=0&fs=1&vr=1&initload=0&theme=000000ff&thumbs=-1"
+        allow="xr-spatial-tracking; gyroscope; accelerometer; fullscreen"
+        allowfullscreen
+        scrolling="no">
+      </iframe>
+    </section>
+
+    <!-- SEZIONE 3: VOYAGER 3D (caricato al primo clic) -->
+    <section id="panel-voyager" class="panel">
+      <iframe
+        id="frame-voyager"
+        data-src="voyager-explorer.html?root=models/tusk/&document=tusk.svx.json"
+        allowfullscreen>
+      </iframe>
+    </section>
+  </main>
+
+  <script>
+    const directUrls = {
+      figma: "https://www.figma.com/proto/RCbz7tdR37fKaC2JMt8dwM/Museo-della-Cultura-e-Musica-Popolare-dei-Peloritani_Allestimento-e-visita-virtuale_Slide?node-id=1-1252&p=f&viewport=-4135%2C30%2C0.06&scaling=min-zoom&content-scaling=fixed&starting-point-node-id=1%3A1252&page-id=0%3A1",
+      kuula: "https://kuula.co/share/collection/7dZJG?logo=-1&info=0&fs=1&vr=1&initload=0&theme=000000ff&thumbs=-1",
+      voyager: "voyager-explorer.html?root=models/tusk/&document=tusk.svx.json"
+    };
+
+    function switchTab(tabName) {
+      // Aggiorna pulsanti
+      document.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.target === tabName);
+      });
+
+      // Aggiorna pannelli
+      document.querySelectorAll(".panel").forEach((panel) => {
+        panel.classList.toggle("active", panel.id === "panel-" + tabName);
+      });
+
+      // Carica l'iframe solo la prima volta che si apre la scheda
+      const frame = document.getElementById("frame-" + tabName);
+      if (frame && !frame.getAttribute("src")) {
+        frame.setAttribute("src", frame.dataset.src);
+      }
+
+      // Aggiorna il link "Apri esterno"
+      const ext = document.getElementById("open-direct");
+      if (ext && directUrls[tabName]) {
+        ext.href = directUrls[tabName];
+      }
+    }
+  </script>
+</body>
+</html>
